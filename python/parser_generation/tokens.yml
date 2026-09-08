@@ -1,0 +1,14 @@
+tokens:
+  INT_KEYWORD: "int"
+  IDENTIFIER: "[a-zA-Z_][a-zA-Z0-9_]*"
+  INT_LIT: "[0-9]+"
+  ASSIGN: "="
+  EOL: ";"
+  BINARY_OP_MAJOR: "[/*]"
+  BINARY_OP_MINOR: "[+-]"
+constructs:
+  TERM: IDENTIFIER; VarNode($IDENTIFIER.value)| INT_LIT; IntLitNode($INT_LIT.value)| TERM BINARY_OP_MINOR TERM; BinaryOpNode($BINARY_OP_MINOR.value, $TERM.node, $TERM.node)
+  EXPR: TERM BINARY_OP_MAJOR TERM; BinaryOpNode($BINARY_OP_MAJOR.value, $TERM.node, $TERM.node)| TERM BINARY_OP_MAJOR EXPR; BinaryOpNode($BINARY_OP_MAJOR.value, $TERM.node, $EXPR.node)| EXPR BINARY_OP_MAJOR TERM; BinaryOpNode($BINARY_OP_MAJOR.value, $EXPR.node, $TERM.node)| EXPR BINARY_OP_MAJOR EXPR; BinaryOpNode($BINARY_OP_MAJOR.value, $EXPR.node, $EXPR.node)
+  ASSIGNMENT: TERM ASSIGN TERM EOL; AssignNode($TERM.node, $TERM.node)| TERM ASSIGN EXPR EOL; AssignNode($TERM.node, $EXPR.node)
+  STATEMENT: ASSIGNMENT; append($ASSIGNMENT.node)
+  # INITIALIZATION: INT_KEYWORD ASSIGNMENT, INT_KEYWORD IDENTIFIER EOL 

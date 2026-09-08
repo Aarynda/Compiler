@@ -1,0 +1,24 @@
+AssignNode:
+  VarNode: b
+  BinaryOpNode: *
+    BinaryOpNode: -
+      IntLitNode: 143
+      IntLitNode: 15
+    IntLitNode: 27
+AssignNode:
+  VarNode: c
+  BinaryOpNode: /
+    VarNode: a
+    VarNode: b
+AssignNode:
+  VarNode: d
+  BinaryOpNode: +
+    BinaryOpNode: +
+      VarNode: a
+      VarNode: b
+    VarNode: c
+AssignNode:
+  VarNode: e
+  BinaryOpNode: *
+    VarNode: d
+    IntLitNode: 153
