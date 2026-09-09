@@ -22,6 +22,8 @@ class VarNode(astNode):
 
 class BinaryOpNode(astNode):
     op = ""
+    left = ""
+    right = ""
 
     def __init__(self, op, left, right):
         self.op = op
