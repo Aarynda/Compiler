@@ -14,6 +14,7 @@ def parse_tokens(construct_list, token_list, python_file):
     node_idxes = {}
     i = 0
     while i < len(token_list):
+        matched = False
         for construct in construct_list.keys():
             for pattern in construct_list[construct].keys():
                 split_pattern = pattern.split(" ")
@@ -55,12 +56,12 @@ def parse_tokens(construct_list, token_list, python_file):
                                 if(len(param_list) > 0):
                                     write_string += ", "
                                 if(type == "node"):
-                                    write_string += token.split("(")[1].strip().strip(")")
+                                    write_string += token.split("(")[-1].strip().strip(")")
                                 elif(type == "value"):
-                                    write_string += "\"" + token.split("(")[1].strip().strip(")") + "\""
+                                    write_string += "\"" + token.split("(")[-1].strip().strip(")") + "\""
                                 else:
                                     print("Error: invalid type of parameter for semantic action")
-                                param_list.append(token.split("(")[1].strip(")"))
+                                param_list.append(token.split("(")[-1].strip(")"))
                                 token_segment.pop(j)
                                 break
                     write_string += ")\n"
@@ -68,8 +69,9 @@ def parse_tokens(construct_list, token_list, python_file):
                     new_token += f" ({node_name})"
                     token_list = token_list[:i] + [new_token + "\n"] + token_list[i + len(split_pattern):]
                     i = 0
-
-        i += 1
+                    matched = True
+        if(matched == False):
+            i += 1
     return token_list
 
 def main():
@@ -82,6 +84,7 @@ def main():
     output_file = open("out.ast", "w")
     python_file = open("generated_ast.py", "w")
     python_file.write("from ast_nodes import *\n")
+    python_file.write("SymbolTable = {}\n")
     python_file.write("StatementList0 = StatementListNode()\n")
     for construct in construct_list:
         curr_list = construct_list[construct].split("|")
@@ -99,6 +102,8 @@ def main():
     output_file.writelines(ast_list)
     python_file.write("traversal = open(\"out.traversal\", \"w\")\n")
     python_file.write("StatementList0.print(traversal, 0)\n")
+    for key in ast_nodes.SymbolTable.keys():
+        python_file.write(f"SymbolTable[{key}] = {ast_nodes.SymbolTable[key]}")
     token_file.close()
     output_file.close()
     python_file.close()

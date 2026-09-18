@@ -1,3 +1,6 @@
+SymbolTable = {}
+next_addr = 0
+
 class astNode:
     value = ""
 
@@ -47,6 +50,38 @@ class AssignNode(astNode):
         output_file.write(f"{'  '*tabs}" + "AssignNode:\n")
         self.var.print(output_file, tabs + 1)
         self.right.print(output_file, tabs + 1)
+
+def alloc_mem(var=str, varType=str):
+    global SymbolTable, next_addr
+    match(varType):
+        case "int":
+            SymbolTable[var] = next_addr
+            next_addr += 4 #assuming 4 byte ints
+        case "char":
+            SymbolTable[var] = next_addr
+            next_addr += 1
+
+class InitializationNode(astNode):
+    var = ""
+    assignment = 0
+    verType = ""
+
+    def __init__(self, assignment, varType=str):
+        if(type(assignment) == AssignNode):
+            self.var = assignment.var
+            self.assignment = assignment
+            self.varType = varType
+        else:
+            self.var = assignment
+            self.assignment = 0
+            self.varType = varType
+        alloc_mem(self.var, varType)
+
+    def print(self, output_file, tabs):
+        output_file.write(f"{'  '*tabs}" + "InitializationNode:\n")
+        self.var.print(output_file, tabs + 1)
+        if(self.assignment != 0):
+            self.assignment.print(output_file, tabs + 1)
 
 
 class StatementListNode(astNode):
